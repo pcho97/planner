@@ -14,7 +14,7 @@
 <style>
 :root{--bg:#FAFAF8;--line:#E4E3DE;--line2:#EFEEEA;--ink:#18181B;--mute:#5F5F5A;--faint:#8A8A84;--chip:#EDECE7;--sat:#2348B8;--sun:#B4231F}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{margin:0;background:var(--bg);color:var(--ink);font-family:'IBM Plex Sans KR',-apple-system,BlinkMacSystemFont,sans-serif;-webkit-text-size-adjust:100%}
+html,body{overscroll-behavior-y:none;margin:0;background:var(--bg);color:var(--ink);font-family:'IBM Plex Sans KR',-apple-system,BlinkMacSystemFont,sans-serif;-webkit-text-size-adjust:100%}
 button{font-family:inherit;color:inherit;cursor:pointer}
 #app{max-width:480px;margin:0 auto;padding:max(12px,env(safe-area-inset-top)) 16px 48px;display:flex;flex-direction:column;gap:22px}
 .head{display:flex;flex-direction:column;gap:14px}
@@ -92,8 +92,8 @@ h2{margin:0;font-size:18px;font-weight:700}
 .rtag.due{font-size:11px;color:#fff;background:var(--sun);padding:2px 7px;border-radius:999px;display:inline}
 .rtag.tent{font-size:11px;color:#3F3F3B;border:1px dashed var(--faint);padding:1px 6px;border-radius:999px;display:inline}
 /* quick add */
-#scrim{position:fixed;inset:0;background:rgba(24,24,27,.35);z-index:10;opacity:0;pointer-events:none;transition:opacity .2s}
-#scrim.on{opacity:1;pointer-events:auto}
+#scrim{position:fixed;inset:0;background:transparent;z-index:10;visibility:hidden;pointer-events:none;transition:background-color .2s}
+#scrim.on{background:rgba(24,24,27,.35);visibility:visible;pointer-events:auto}
 #qa{position:fixed;top:0;left:0;right:0;z-index:20;background:var(--bg);padding:max(14px,env(safe-area-inset-top)) 16px 18px;border-radius:0 0 20px 20px;box-shadow:0 12px 32px rgba(0,0,0,.18);transform:translateY(-110%);transition:transform .28s ease}
 #qa.on{transform:translateY(0)}
 #qa .inner{max-width:480px;margin:0 auto}
@@ -138,7 +138,6 @@ h2{margin:0;font-size:18px;font-weight:700}
 </div>
 <main id="app"></main>
 <div id="toast" role="status"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg><span id="toastt"></span></div>
-<label id="hap-l" aria-hidden="true"><input type="checkbox" switch tabindex="-1"></label>
 
 <script>
 var API = 'https://script.google.com/macros/s/AKfycbyu904qUEAlw9F9QeZCrjHJJnn3LCwKaH51EC3q9YMn0YRixNOE5lvp9EwpK9c96wGY/exec';
@@ -411,7 +410,12 @@ function renderPrev() {
 var qi = document.getElementById('qi');
 function haptic() {
   try { if (navigator.vibrate) navigator.vibrate(12); } catch (e) {}
-  try { document.getElementById('hap-l').click(); } catch (e) {}
+  try {
+    var l = document.createElement('label'), i = document.createElement('input');
+    l.setAttribute('aria-hidden', 'true'); l.style.display = 'none';
+    i.type = 'checkbox'; i.setAttribute('switch', '');
+    l.appendChild(i); document.head.appendChild(l); l.click(); document.head.removeChild(l);
+  } catch (e) {}
 }
 var toastT;
 function flash(msg) {
